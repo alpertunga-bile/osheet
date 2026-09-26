@@ -107,7 +107,7 @@ def check_audio_stream_empty(info: AudioStreamInfo) -> bool:
 
 
 def get_default_audio_stream_info() -> AudioStreamInfo:
-    return AudioStreamInfo(codec_name="", profile="", sample_rate="", channels=0)
+    return AudioStreamInfo(codec_name="", profile="", sample_rate=0, channels=0)
 
 
 def create_audio_stream_info(config: typing.Any) -> AudioStreamInfo:
