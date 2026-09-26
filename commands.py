@@ -9,13 +9,13 @@ import infos
 import utils
 
 
-def run_cmd(cmd: str | list[str]) -> tuple[bool, bytes]:
-    if isinstance(cmd, list):
-        command = " ".join(cmd)
-    else:
-        command = cmd
-
-    result = subprocess.run(command, capture_output=True, shell=True, check=False)
+def run_cmd(command: list[str]) -> tuple[bool, bytes]:
+    try:
+        result = subprocess.run(
+            command, capture_output=True, shell=False, check=False, timeout=180
+        )
+    except:
+        return (False, b"")
 
     if 0 != result.returncode:
         print("The run command is failed")
@@ -38,22 +38,25 @@ def get_stream_infos(
         utils.log_error(filepath, "doesnot exist")
         return (video_stream, audio_stream)
 
-    command = (
-        f"ffprobe -v error -print_format json -show_format -show_streams {filepath}"
+    is_success, result = run_cmd(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-print_format",
+            "json",
+            "-show_format",
+            "-show_streams",
+            filepath,
+        ]
     )
-
-    is_success, result = run_cmd(command)
 
     if is_success is False:
         return (video_stream, audio_stream)
 
     streams = json.loads(result)["streams"]
 
-    if 2 == len(streams):
-        video_stream = infos.create_video_stream_info(streams[0])
-        audio_stream = infos.create_audio_stream_info(streams[1])
-    if 1 == len(streams):
-        stream = streams[0]
+    for stream in streams:
         codec_type = stream["codec_type"]
 
         if "video" == codec_type:
@@ -71,6 +74,7 @@ def extract_tiles(
     tile_w: int = 320,
     out_dir: str = "temp",
 ) -> list[str]:
+    os.makedirs("temp", exist_ok=True)
     tiles = []
 
     for i in track(range(n_tiles), description="Extracting video frames"):
