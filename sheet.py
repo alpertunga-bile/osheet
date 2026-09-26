@@ -1,15 +1,14 @@
-import datetime
 import math
+import os
 import time
 
 from PIL import Image, ImageDraw, ImageFont
 from rich.console import Console
 
 import commands
+import infos
 import metadata
 import tiles
-import os
-import infos
 import utils
 
 COLS = 4
@@ -17,6 +16,16 @@ TILE_W, TILE_H = 320, 180
 GAP = 5  # spacing between tiles
 MARGIN = 10  # outer margin
 SEPARATOR_GAP = 8  # extra space between the two sections
+
+
+def get_duration_string(duration: float) -> str:
+    pruned_duration = int(duration)
+
+    hours = pruned_duration // 3600
+    minutes = (pruned_duration - hours * 3600) // 60
+    seconds = pruned_duration - hours * 3600 - minutes * 60
+
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
 def create_sheet(
@@ -47,14 +56,14 @@ def create_sheet(
         f"Filepath : {os.path.basename(video_filepath)}",
         f"Resolution : {video_stream.width}x{video_stream.height}",
         f"Coded Resoulution : {video_stream.coded_width}x{video_stream.coded_height}",
-        f"Duration : 0{datetime.timedelta(seconds=video_stream.duration)}",
+        f"Duration : {get_duration_string(video_stream.duration)}",
         f"Video Codec : {video_stream.codec_name.upper()} {video_stream.profile.upper()}",
         f"Frame Rate : {video_stream.frame_rate:.2f} fps",
         f"Pixel Format : {video_stream.pix_fmt.upper()}",
         f"Color Space : {video_stream.color_space.upper()}",
         f"Audio Codec : {audio_stream.codec_name.upper()}",
         f"Sample Rate : {audio_stream.sample_rate}",
-        f"Channels: {audio_stream.channels} Channels",
+        f"Channels : {audio_stream.channels} Channels",
     ]
 
     line_h = font_meta.size + 4
@@ -79,7 +88,7 @@ def create_sheet(
         video_tiles, canvas, MARGIN, header_h, SEPARATOR_GAP, TILE_H, TILE_W, COLS, GAP
     )
 
-    canvas.save(save_filepath)
+    canvas.save(save_filepath, format="PNG")
 
     console.print(
         f"[bold green]✔[/] [bold]{save_filepath}[/] [dim]output file is saved[/]",
