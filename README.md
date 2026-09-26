@@ -28,7 +28,7 @@ python -m venv venv
 
 | Argument Name | Default Value | Description |
 | :-----------: | :-----------: | :---------- |
-| --input; -i   | **required**    | Real or relative path of the video file |  
+| --input; -i   | *required*    | Real or relative path of the video file |  
 | --font; -f    | DejaVuSans-Bold.ttf | Font type of the metadata |
 | --font_size; -fs | 16 | Size of the font of the metadata |
 | --rows; -r | 4 | Total tile rows of the tile grid |
