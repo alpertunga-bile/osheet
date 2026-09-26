@@ -106,7 +106,7 @@ def extract_tiles(
                 "-loglevel",
                 "error",
                 "-ss",
-                f"{t:.3f}",  # fast seek BEFORE -i
+                f"{t:.3f}",
                 "-i",
                 video_filepath,
                 "-frames:v",
@@ -115,7 +115,7 @@ def extract_tiles(
                 f"scale={tile_w}:-2",
                 "-f",
                 "image2",
-                "-y",  # overwrite without prompting
+                "-y",
                 str(tile),
             ]
         )
