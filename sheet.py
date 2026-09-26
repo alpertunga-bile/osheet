@@ -11,12 +11,6 @@ import metadata
 import tiles
 import utils
 
-COLS = 4
-TILE_W, TILE_H = 320, 180
-GAP = 5  # spacing between tiles
-MARGIN = 10  # outer margin
-SEPARATOR_GAP = 8  # extra space between the two sections
-
 
 def get_duration_string(duration: float) -> str:
     pruned_duration = int(duration)
@@ -31,8 +25,13 @@ def get_duration_string(duration: float) -> str:
 def create_sheet(
     video_filepath: str,
     font_meta: ImageFont.FreeTypeFont,
-    n_tiles: int,
     save_filepath: str,
+    rows: int,
+    cols: int,
+    tile: tuple[int, int],
+    gap: int,
+    margin: int,
+    seperator_gap: int,
 ) -> None:
     console = Console()
 
@@ -50,47 +49,61 @@ def create_sheet(
 
     utils.log_done(video_filepath, "file's metadata is extracted")
 
-    video_tiles = commands.extract_tiles(video_filepath, n_tiles, video_stream.duration)
+    video_tiles = commands.extract_tiles(
+        video_filepath, rows * cols, video_stream.duration
+    )
 
     meta_lines = [
-        f"Filepath : {os.path.basename(video_filepath)}",
+        f"Filename : {os.path.basename(video_filepath)}",
         f"Resolution : {video_stream.width}x{video_stream.height}",
         f"Coded Resoulution : {video_stream.coded_width}x{video_stream.coded_height}",
         f"Duration : {get_duration_string(video_stream.duration)}",
-        f"Video Codec : {video_stream.codec_name.upper()} {video_stream.profile.upper()}",
+        f"Video Codec : {video_stream.codec_name} {video_stream.profile}",
         f"Frame Rate : {video_stream.frame_rate:.2f} fps",
-        f"Pixel Format : {video_stream.pix_fmt.upper()}",
-        f"Color Space : {video_stream.color_space.upper()}",
-        f"Audio Codec : {audio_stream.codec_name.upper()}",
-        f"Sample Rate : {audio_stream.sample_rate}",
-        f"Channels : {audio_stream.channels} Channels",
+        f"Pixel Format : {video_stream.pix_fmt}",
+        f"Color Space : {video_stream.color_space}",
+        f"Audio : {audio_stream.codec_name} {audio_stream.sample_rate} {audio_stream.channels} Channels",
     ]
 
     line_h = font_meta.size + 4
-    header_h = MARGIN + len(meta_lines) * line_h + MARGIN  # text band height
+    header_h = margin + len(meta_lines) * line_h + margin  # text band height
 
-    rows = math.ceil(n_tiles / COLS)
-    grid_w = COLS * TILE_W + (COLS - 1) * GAP
-    grid_h = rows * TILE_H + (rows - 1) * GAP
+    grid_w = cols * tile[0] + (cols - 1) * gap
+    grid_h = rows * tile[1] + (rows - 1) * gap
 
-    W = MARGIN * 2 + grid_w
-    H = MARGIN * 2 + header_h + SEPARATOR_GAP + grid_h
+    width = margin * 2 + grid_w
+    height = margin * 2 + header_h + seperator_gap + grid_h
 
-    canvas = Image.new("RGBA", (int(W), int(H)), (0, 0, 0, 255))
+    canvas = Image.new("RGBA", (int(width), int(height)), (0, 0, 0, 255))
     draw = ImageDraw.Draw(canvas)
 
-    metadata.draw_metadata(meta_lines, draw, MARGIN, line_h, font_meta)
+    metadata.draw_metadata(meta_lines, draw, margin, line_h, font_meta)
 
-    sep_y = MARGIN + header_h + SEPARATOR_GAP // 2
-    draw.line([(MARGIN, sep_y), (W - MARGIN, sep_y)], fill=(255, 255, 255, 80), width=1)
+    sep_y = margin + header_h + seperator_gap // 2
+    draw.line(
+        [(margin, sep_y), (width - margin, sep_y)], fill=(255, 255, 255, 80), width=1
+    )
 
     tiles.draw_tiles_block(
-        video_tiles, canvas, MARGIN, header_h, SEPARATOR_GAP, TILE_H, TILE_W, COLS, GAP
+        video_tiles,
+        canvas,
+        margin,
+        header_h,
+        seperator_gap,
+        tile[1],
+        tile[0],
+        cols,
+        gap,
     )
 
     canvas.save(save_filepath, format="PNG")
 
     console.print(
-        f"[bold green]✔[/] [bold]{save_filepath}[/] [dim]output file is saved[/]",
+        f"[bold green]✔[/] [bold]{save_filepath}[/] [dim] {width}x{height} output file is saved[/]",
         highlight=False,
     )
+
+    print(" Metadata of the video file ".center(64, "-"))
+
+    for line in meta_lines:
+        print(line)
