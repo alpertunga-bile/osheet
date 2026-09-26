@@ -2,3 +2,6 @@ temp/
 venv/
 __pycache__/
 *.png
+main.dist/
+main.onefile-build/
+*.bin
