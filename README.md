@@ -26,6 +26,27 @@ python -m venv venv
 
 ## CLI Arguments
 
+```
+❯ ./venv/bin/python main.py --help
+usage: Create video contact sheet with rich metadata
+
+options:
+  -h, --help            show this help message and exit
+  --input, -i INPUT     Input video filepath
+  --font, -f FONT       Font type of the metadata
+  --font_size, -fs FONT_SIZE
+                        Size of the font of metadata
+  --rows, -r ROWS       Total tile rows in the output
+  --cols, -c COLS       Total tile columns in the output
+  --tile_w, -tw TILE_W  Width of one tile
+  --tile_h, -th TILE_H  Height of one tile
+  --gap, -g GAP         Spacing between tiles
+  --margin, -m MARGIN   Outer margin
+  --sep_gap, -sg SEP_GAP
+                        Extra space between text and tiles
+  --output, -o OUTPUT   Output file
+```
+
 | Argument Name | Default Value | Description |
 | :-----------: | :-----------: | :---------- |
 | --input; -i   | *required*    | Real or relative path of the video file |  
