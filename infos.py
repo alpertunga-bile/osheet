@@ -71,7 +71,9 @@ def create_video_stream_info(config: typing.Any) -> VideoStreamInfo:
             int(frame_rate[:div_idx]),
             int(frame_rate[div_idx + 1 :]),
         )
-        calc_frame_rate = first_number / second_number
+
+        if second_number != 0:
+            calc_frame_rate = first_number / second_number
 
     return VideoStreamInfo(
         codec_name=json_get_str_val_or_default(config, "codec_name"),
@@ -91,7 +93,7 @@ def create_video_stream_info(config: typing.Any) -> VideoStreamInfo:
 class AudioStreamInfo:
     codec_name: str
     profile: str
-    sample_rate: str
+    sample_rate: int
     channels: int
 
 
@@ -99,7 +101,7 @@ def check_audio_stream_empty(info: AudioStreamInfo) -> bool:
     return (
         0 == len(info.codec_name)
         and 0 == len(info.profile)
-        and 0 == len(info.sample_rate)
+        and 0 == info.sample_rate
         and 0 == info.channels
     )
 
@@ -112,6 +114,6 @@ def create_audio_stream_info(config: typing.Any) -> AudioStreamInfo:
     return AudioStreamInfo(
         codec_name=json_get_str_val_or_default(config, "codec_name"),
         profile=json_get_str_val_or_default(config, "profile"),
-        sample_rate=json_get_str_val_or_default(config, "sample_rate"),
+        sample_rate=int(json_get_str_val_or_default(config, "sample_rate", "0")),
         channels=json_get_int_val_or_default(config, "channels"),
     )
