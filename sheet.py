@@ -47,14 +47,16 @@ def create_sheet(
         utils.log_error(video_filepath, "cannot extract audio metadata")
         return
 
-    utils.log_done(video_filepath, "file's metadata is extracted")
+    filename = os.path.basename(video_filepath)
+
+    utils.log_done(filename, "file's metadata is extracted")
 
     video_tiles = commands.extract_tiles(
         video_filepath, rows * cols, video_stream.duration
     )
 
     meta_lines = [
-        f"Filename : {os.path.basename(video_filepath)}",
+        f"Filename : {filename}",
         f"Resolution : {video_stream.width}x{video_stream.height}",
         f"Coded Resoulution : {video_stream.coded_width}x{video_stream.coded_height}",
         f"Duration : {get_duration_string(video_stream.duration)}",
@@ -66,13 +68,13 @@ def create_sheet(
     ]
 
     line_h = font_meta.size + 4
-    header_h = margin + len(meta_lines) * line_h + margin  # text band height
+    header_h = margin + len(meta_lines) * line_h + margin  # metadata height
 
     grid_w = cols * tile[0] + (cols - 1) * gap
     grid_h = rows * tile[1] + (rows - 1) * gap
 
-    width = margin * 2 + grid_w
-    height = margin * 2 + header_h + seperator_gap + grid_h
+    width = margin * 2 + grid_w  # total output width
+    height = margin * 2 + header_h + seperator_gap + grid_h  # total output height
 
     canvas = Image.new("RGBA", (int(width), int(height)), (0, 0, 0, 255))
     draw = ImageDraw.Draw(canvas)
@@ -84,14 +86,15 @@ def create_sheet(
         [(margin, sep_y), (width - margin, sep_y)], fill=(255, 255, 255, 80), width=1
     )
 
+    tile_start_h = margin + header_h + seperator_gap
+
     tiles.draw_tiles_block(
         video_tiles,
         canvas,
+        tile_start_h,
         margin,
-        header_h,
-        seperator_gap,
-        tile[1],
         tile[0],
+        tile[1],
         cols,
         gap,
     )

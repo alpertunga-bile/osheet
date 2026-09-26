@@ -9,6 +9,7 @@ def draw_metadata(
     font_meta: ImageFont.FreeTypeFont,
 ) -> None:
     y = margin
+
     for line in lines:
         draw.text((margin, y), line, font=font_meta, fill=(255, 255, 255))
         y += line_h
