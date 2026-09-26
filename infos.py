@@ -3,17 +3,17 @@ import typing
 
 
 def json_get_str_val_or_default(config: typing.Any, key: str, default: str = "") -> str:
-    return str(config[key]) if config[key] else default
+    return str(config[key]) if config.get(key) else default
 
 
 def json_get_int_val_or_default(config: typing.Any, key: str, default: int = 0) -> int:
-    return int(config[key]) if config[key] else default
+    return int(config[key]) if config.get(key) else default
 
 
 def json_get_float_val_or_default(
     config: typing.Any, key: str, default: float = 0
 ) -> float:
-    return float(config[key]) if config[key] else default
+    return float(config[key]) if config.get(key) else default
 
 
 @dataclasses.dataclass

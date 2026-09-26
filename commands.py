@@ -12,9 +12,15 @@ import utils
 def run_cmd(command: list[str]) -> tuple[bool, bytes]:
     try:
         result = subprocess.run(
-            command, capture_output=True, shell=False, check=False, timeout=180
+            command,
+            capture_output=True,
+            shell=False,
+            check=False,
+            timeout=180,
+            stdin=subprocess.DEVNULL,
         )
-    except:
+    except (OSError, subprocess.SubprocessError) as error:
+        utils.log_error("commands.py", f"cannot run {command}")
         return (False, b"")
 
     if 0 != result.returncode:
@@ -54,7 +60,13 @@ def get_stream_infos(
     if is_success is False:
         return (video_stream, audio_stream)
 
-    streams = json.loads(result)["streams"]
+    try:
+        stream_json = json.loads(result)
+    except json.JSONDecodeError:
+        utils.log_error(filepath, "ffprobe output cannot be parsed")
+        return (video_stream, audio_stream)
+
+    streams = stream_json["streams"]
 
     for stream in streams:
         codec_type = stream["codec_type"]
@@ -63,6 +75,11 @@ def get_stream_infos(
             video_stream = infos.create_video_stream_info(stream)
         elif "audio" == codec_type:
             audio_stream = infos.create_audio_stream_info(stream)
+
+    if 0.0 == video_stream.duration:
+        video_stream.duration = infos.json_get_float_val_or_default(
+            stream_json["format"], "duration", 0.0
+        )
 
     return (video_stream, audio_stream)
 
