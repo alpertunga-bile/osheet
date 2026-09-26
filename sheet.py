@@ -55,20 +55,23 @@ def create_sheet(
         video_filepath, rows * cols, video_stream.duration
     )
 
-    meta_lines = [
-        f"Filename : {filename}",
-        f"Resolution : {video_stream.width}x{video_stream.height}",
-        f"Coded Resoulution : {video_stream.coded_width}x{video_stream.coded_height}",
-        f"Duration : {get_duration_string(video_stream.duration)}",
-        f"Video Codec : {video_stream.codec_name} {video_stream.profile}",
-        f"Frame Rate : {video_stream.frame_rate:.2f} fps",
-        f"Pixel Format : {video_stream.pix_fmt}",
-        f"Color Space : {video_stream.color_space}",
-        f"Audio : {audio_stream.codec_name} {audio_stream.sample_rate} {audio_stream.channels} Channels",
+    meta_pairs = [
+        ("Filename", filename),
+        ("Resolution", f"{video_stream.width}x{video_stream.height}"),
+        ("Coded Resolution", f"{video_stream.coded_width}x{video_stream.coded_height}"),
+        ("Duration", get_duration_string(video_stream.duration)),
+        ("Video Codec", f"{video_stream.codec_name} {video_stream.profile}"),
+        ("Frame Rate", f"{video_stream.frame_rate:.2f} fps"),
+        ("Pixel Format", video_stream.pix_fmt),
+        ("Color Space", video_stream.color_space),
+        (
+            "Audio",
+            f"{audio_stream.codec_name} {audio_stream.sample_rate} {audio_stream.channels} Channels",
+        ),
     ]
 
     line_h = font_meta.size + 4
-    header_h = margin + len(meta_lines) * line_h + margin  # metadata height
+    header_h = margin + len(meta_pairs) * line_h + margin  # metadata height
 
     grid_w = cols * tile[0] + (cols - 1) * gap
     grid_h = rows * tile[1] + (rows - 1) * gap
@@ -79,7 +82,7 @@ def create_sheet(
     canvas = Image.new("RGBA", (int(width), int(height)), (0, 0, 0, 255))
     draw = ImageDraw.Draw(canvas)
 
-    metadata.draw_metadata(meta_lines, draw, margin, line_h, font_meta)
+    metadata.draw_metadata(meta_pairs, draw, margin, line_h, font_meta)
 
     sep_y = margin + header_h + seperator_gap // 2
     draw.line(
@@ -108,5 +111,6 @@ def create_sheet(
 
     print(" Metadata of the video file ".center(64, "-"))
 
-    for line in meta_lines:
-        print(line)
+    label_w = max(len(label) for label, _ in meta_pairs)
+    for label, value in meta_pairs:
+        print(f"{label:<{label_w}} : {value}")
