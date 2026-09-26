@@ -1,3 +1,5 @@
+import shutil
+
 from PIL import Image
 
 
@@ -22,5 +24,8 @@ def draw_tiles_block(
         x = margin + col * (tile_w + gap)
         y = tiles_top + row * (tile_h + gap)
 
-        w, h = tile.size
         canvas.paste(tile, (x, y, x + w, y + h))
+
+        tile.close()
+
+    shutil.rmtree("temp")
