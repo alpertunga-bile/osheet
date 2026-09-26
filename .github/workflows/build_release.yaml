@@ -108,7 +108,7 @@ jobs:
           # gcc is preinstalled on ubuntu-latest
           python -m nuitka $NUITKA_FLAGS $ENTRY_POINT
           base=$(basename "$ENTRY_POINT" .py)
-          mv "$base.dist/$base.bin" "$APP_NAME-linux-$(uname -m)"
+          mv "$base.dist/$base.bin" "$APP_NAME-linux-$(uname -m).bin"
           echo "asset=$APP_NAME-linux-$(uname -m)" >> "$GITHUB_OUTPUT"
 
       - name: Upload to GitHub Release
@@ -159,7 +159,7 @@ jobs:
           # Clang (Xcode Command Line Tools) is preinstalled on macos-latest
           python -m nuitka $NUITKA_FLAGS $ENTRY_POINT
           base=$(basename "$ENTRY_POINT" .py)
-          mv "$base.dist/$base.bin" "$APP_NAME-darwin-$(uname -m)"
+          mv "$base.dist/$base.bin" "$APP_NAME-darwin-$(uname -m).bin"
           echo "asset=$APP_NAME-darwin-$(uname -m)" >> "$GITHUB_OUTPUT"
 
       - name: Upload to GitHub Release
